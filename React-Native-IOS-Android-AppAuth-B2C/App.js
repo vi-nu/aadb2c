@@ -13,29 +13,40 @@ type State = {
   refreshToken: ?string
 };
 
-const config = {
-  serviceConfiguration: {
-    authorizationEndpoint: "https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/oauth2/v2.0/authorize?p=b2c_1_vinu",
-    tokenEndpoint: "https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/oauth2/v2.0/token?p=b2c_1_vinu",
-    revocationEndpoint: "https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/oauth2/v2.0/logout?p=b2c_1_vinu"
-  },
-  clientId: 'cdb57ca8-3d82-42dc-a810-e6e42490f528',
-  redirectUrl: 'com.onmicrosoft.fabrikamb2c.exampleapp://oauth/redirect',
-  additionalParameters: {},
-  scopes: ['openid']
+// const config = {
+//   issuer: 'https://demo.identityserver.io',
+//   clientId: 'native.code',
+//   redirectUrl: 'io.identityserver.demo:/oauthredirect',
+//   additionalParameters: {},
+//   scopes: ['openid', 'profile', 'email', 'offline_access']
+//
+//   // serviceConfiguration: {
+//   //   authorizationEndpoint: 'https://demo.identityserver.io/connect/authorize',
+//   //   tokenEndpoint: 'https://demo.identityserver.io/connect/token',
+//   //   revocationEndpoint: 'https://demo.identityserver.io/connect/revoke'
+//   // }
+// };
+console.disableYellowBox = true;
 
-  // serviceConfiguration: {
-  //   authorizationEndpoint: 'https://demo.identityserver.io/connect/authorize',
-  //   tokenEndpoint: 'https://demo.identityserver.io/connect/token',
-  //   revocationEndpoint: 'https://demo.identityserver.io/connect/revoke'
-  // }
+const config = {
+  issuer: 'https://potterworld.b2clogin.com/a5386328-3eba-4dc2-9fdc-44b001832fe5/v2.0/',
+  clientId: 'cdb57ca8-3d82-42dc-a810-e6e42490f528',
+  // redirectUrl: 'urn.ietf.wg.oauth.2.0.oob://oauthredirect',
+  redirectUrl: 'vinu://callback',
+  additionalParameters: {},
+  scopes: ['openid', 'cdb57ca8-3d82-42dc-a810-e6e42490f528', 'offline_access'],
+
+  serviceConfiguration: {
+     authorizationEndpoint: 'https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/b2c_1_vinu/oauth2/v2.0/authorize',
+     tokenEndpoint: 'https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/b2c_1_vinu/oauth2/v2.0/token',
+     revocationEndpoint: 'https://potterworld.b2clogin.com/potterworld.onmicrosoft.com/b2c_1_vinu/oauth2/v2.0/logout'
+   }
 };
 
 export default class App extends Component<{}, State> {
   state = {
     hasLoggedInOnce: false,
     accessToken: '',
-    idToken: '',
     accessTokenExpirationDate: '',
     refreshToken: ''
   };
@@ -50,21 +61,22 @@ export default class App extends Component<{}, State> {
   }
 
   authorize = async () => {
+    console.log("aaa");
     try {
       const authState = await authorize(config);
-
+      console.log("ccc");
+      console.log(authState);
       this.animateState(
         {
           hasLoggedInOnce: true,
           accessToken: authState.accessToken,
           accessTokenExpirationDate: authState.accessTokenExpirationDate,
-          idToken: authState.idToken,
-          refreshToken: authState.refreshToken,
-          scopes: authState.scopes
+          refreshToken: authState.refreshToken
         },
         500
       );
     } catch (error) {
+      console.log("ddd");
       Alert.alert('Failed to log in', error.message);
     }
   };
@@ -89,11 +101,10 @@ export default class App extends Component<{}, State> {
   revoke = async () => {
     try {
       await revoke(config, {
-        tokenToRevoke: this.state.idToken,
+        tokenToRevoke: this.state.accessToken,
         sendClientId: true
       });
       this.animateState({
-        idToken: '',
         accessToken: '',
         accessTokenExpirationDate: '',
         refreshToken: ''
@@ -104,30 +115,29 @@ export default class App extends Component<{}, State> {
   };
 
   render() {
+    console.log("bbb");
     const { state } = this;
     return (
       <Page>
-        {!!state.idToken ? (
+        {!!state.accessToken ? (
           <Form>
-            <Form.Label>idToken</Form.Label>
-            <Form.Value>{state.idToken}</Form.Value>
-            <Form.Label>scopes</Form.Label>
-            <Form.Value>{state.scopes.join(', ')}</Form.Value>
+            <Form.Label>accessToken</Form.Label>
+            <Form.Value>{state.accessToken}</Form.Value>
+            <Form.Label>accessTokenExpirationDate</Form.Label>
+            <Form.Value>{state.accessTokenExpirationDate}</Form.Value>
+            <Form.Label>refreshToken</Form.Label>
+            <Form.Value>{state.refreshToken}</Form.Value>
           </Form>
         ) : (
-            <Heading>{state.hasLoggedInOnce ? 'Goodbye.' : 'Hello, stranger.'}</Heading>
-          )}
+          <Heading>{state.hasLoggedInOnce ? 'Goodbye.' : 'Hello, stranger.'}</Heading>
+        )}
 
         <ButtonContainer>
-          {!state.idToken ? (
-            <Button onPress={this.authorize} text="Authorize" color="#DA2536" />
-          ) : null}
-          {!!state.refreshToken ? (
-            <Button onPress={this.refresh} text="Refresh" color="#24C2CB" />
-          ) : null}
-          {!!state.idToken ? (
-            <Button onPress={this.revoke} text="Revoke" color="#EF525B" />
-          ) : null}
+          {!state.accessToken && (
+            <Button onPress={this.authorize} text="Login" color="#DA2536" />
+          )}
+          {!!state.refreshToken && <Button onPress={this.refresh} text="Refresh" color="#24C2CB" />}
+          {!!state.accessToken && <Button onPress={this.revoke} text="Logout" color="#EF525B" />}
         </ButtonContainer>
       </Page>
     );
