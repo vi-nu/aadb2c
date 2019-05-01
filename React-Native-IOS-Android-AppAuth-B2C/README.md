@@ -1,6 +1,6 @@
-# aadb2c
+# Secure your React Native Apps with Azure AD B2C
 
-This sample uses Azure AD B2C as an Identity Provider to your react-native apps and adapted from [FormidableLabs](https://github.com/FormidableLabs/react-native-app-auth).
+This sample uses Azure AD B2C as an Identity Provider and adapted from [FormidableLabs](https://github.com/FormidableLabs/react-native-app-auth).
 
 ## Getting Started
 
