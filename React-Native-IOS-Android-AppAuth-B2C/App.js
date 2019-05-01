@@ -13,19 +13,6 @@ type State = {
   refreshToken: ?string
 };
 
-// const config = {
-//   issuer: 'https://demo.identityserver.io',
-//   clientId: 'native.code',
-//   redirectUrl: 'io.identityserver.demo:/oauthredirect',
-//   additionalParameters: {},
-//   scopes: ['openid', 'profile', 'email', 'offline_access']
-//
-//   // serviceConfiguration: {
-//   //   authorizationEndpoint: 'https://demo.identityserver.io/connect/authorize',
-//   //   tokenEndpoint: 'https://demo.identityserver.io/connect/token',
-//   //   revocationEndpoint: 'https://demo.identityserver.io/connect/revoke'
-//   // }
-// };
 console.disableYellowBox = true;
 
 const config = {
@@ -61,11 +48,8 @@ export default class App extends Component<{}, State> {
   }
 
   authorize = async () => {
-    console.log("aaa");
     try {
       const authState = await authorize(config);
-      console.log("ccc");
-      console.log(authState);
       this.animateState(
         {
           hasLoggedInOnce: true,
@@ -76,7 +60,6 @@ export default class App extends Component<{}, State> {
         500
       );
     } catch (error) {
-      console.log("ddd");
       Alert.alert('Failed to log in', error.message);
     }
   };
@@ -115,7 +98,6 @@ export default class App extends Component<{}, State> {
   };
 
   render() {
-    console.log("bbb");
     const { state } = this;
     return (
       <Page>
