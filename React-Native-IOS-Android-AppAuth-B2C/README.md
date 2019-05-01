@@ -75,3 +75,6 @@ const config = {
 cd ..
 react-native run-android
 ```
+
+### IOS Setup
+Coming soon...
